@@ -9,6 +9,7 @@ from utils.metrics import weighted_average
 from attacks.badunlearn import BadUnlearnAttack
 from attacks.label_flip import LabelFlipAttack
 from attacks.fti import FTIAttack
+from attacks.byzantine_local_poison import ByzantineLocalPoison
 
 
 from torch.utils.data import DataLoader
@@ -27,6 +28,9 @@ def get_attack(name):
     
     elif name == "fti":
         return FTIAttack(eta=10)
+    
+    elif name == "byzantine":
+        return ByzantineLocalPoison(z=5)
 
 
     else:
@@ -94,8 +98,14 @@ if __name__ == "__main__":
     #     malicious_ratio=0.1
     # )
 
-    print("\n=== FTI ATTACK ===\n")
+    # print("\n=== FTI ATTACK ===\n")
+    # run_simulation(
+    #     attack_name="fti",
+    #     malicious_ratio=0.2
+    # )
+
+    print("\n=== BYZANTINE LOCAL POISON ATTACK ===\n")
     run_simulation(
-        attack_name="fti",
+        attack_name="byzantine",
         malicious_ratio=0.2
     )
