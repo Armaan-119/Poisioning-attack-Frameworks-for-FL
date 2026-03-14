@@ -10,7 +10,10 @@ from attacks.badunlearn import BadUnlearnAttack
 from attacks.label_flip import LabelFlipAttack
 from attacks.fti import FTIAttack
 from attacks.byzantine_local_poison import ByzantineLocalPoison
-
+from attacks.alie import ALIEAttack
+from attacks.scapegoat_mia import ScapegoatMIAAttack
+from attacks.model_replacement import ModelReplacementAttack
+from attacks.mpaf import MPAFAttack
 
 from torch.utils.data import DataLoader
 
@@ -31,7 +34,18 @@ def get_attack(name):
     
     elif name == "byzantine":
         return ByzantineLocalPoison(z=5)
+    
+    elif name == "alie":
+        return ALIEAttack(z=5)
 
+    elif name == "scapegoat":
+        return ScapegoatMIAAttack(lam=0.5)
+    
+    elif name == "model_replacement":
+        return ModelReplacementAttack(num_clients=num_clients)
+    
+    elif name == "mpaf":
+        return MPAFAttack(scale=5) #5 fake clients
 
     else:
         return None
@@ -55,6 +69,12 @@ def client_fn(context: Context, attack_name, malicious_ratio):
 
     if attack_name == "fti" and attack is not None:
         attack.set_base_model(model)
+    if attack_name == "scapegoat" and attack is not None:
+        attack.set_target(model)
+    if attack_name == "model_replacement" and attack is not None:
+       attack.set_global_model(model)
+    if attack_name == "mpaf" and attack is not None:
+      attack.set_base_model(model)
 
     return FlowerClient(
         model,
@@ -108,4 +128,29 @@ if __name__ == "__main__":
     run_simulation(
         attack_name="byzantine",
         malicious_ratio=0.2
+    )
+    
+    
+    print("\n=== ALIE ATTACK ===\n")
+    run_simulation(
+         attack_name="alie",
+        malicious_ratio=0.2
+    )
+    
+    print("\n=== SCAPEGOAT MIA ATTACK ===\n")
+    run_simulation(
+        attack_name="scapegoat",
+        malicious_ratio=0.2
+    )
+    
+    print("\n=== MODEL REPLACEMENT ATTACK ===\n")
+    run_simulation(
+        attack_name="model_replacement",
+        malicious_ratio=0.2
+    )
+    
+    print("\n=== MPAF ATTACK ===\n")
+    run_simulation(
+        attack_name="mpaf",
+        malicious_ratio=0.3
     )
